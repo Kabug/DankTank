@@ -55,7 +55,10 @@ def on_release(key):
         elif key.char == ("d"):
             direction_state[3] = False
         else:
-            robot.stop()
+            GPIO.output(left_motor[0], GPIO.LOW)
+            GPIO.output(left_motor[1], GPIO.LOW)
+            GPIO.output(right_motor[0], GPIO.LOW)
+            GPIO.output(right_motor[1], GPIO.LOW)
     except AttributeError:
         print("special press {0}".format(key))
 
@@ -64,39 +67,49 @@ kblistener = keyboard.Listener(
         on_press=on_press,
         on_release=on_release)
 kblistener.start() 
-    
+
+def go_forwards():
+    GPIO.output(left_motor[0], GPIO.HIGH)
+    GPIO.output(left_motor[1], GPIO.LOW)
+    GPIO.output(right_motor[0], GPIO.HIGH)
+    GPIO.output(right_motor[1], GPIO.LOW)
+    time.sleep(0.0003)
+    GPIO.output(left_motor[0], GPIO.LOW)
+    time.sleep(0.0003)
+    GPIO.output(left_motor[0], GPIO.HIGH)
+
+def go_left():
+     GPIO.output(left_motor[0], GPIO.LOW)
+     GPIO.output(left_motor[1], GPIO.HIGH)
+     GPIO.output(right_motor[0], GPIO.HIGH)
+     GPIO.output(right_motor[1], GPIO.LOW)
+
+def go_backwards():     
+    GPIO.output(left_motor[0], GPIO.LOW)
+    GPIO.output(left_motor[1], GPIO.HIGH)
+    GPIO.output(right_motor[0], GPIO.LOW)
+    GPIO.output(right_motor[1], GPIO.HIGH)
+    time.sleep(0.0003)
+    GPIO.output(left_motor[0], GPIO.HIGH)
+    time.sleep(0.0003)
+    GPIO.output(left_motor[0], GPIO.LOW)
+
+def go_right():
+    GPIO.output(left_motor[0], GPIO.HIGH)
+    GPIO.output(left_motor[1], GPIO.LOW)
+    GPIO.output(right_motor[0], GPIO.LOW)
+    GPIO.output(right_motor[1], GPIO.HIGH)
+
 while run == True:
     if direction_state[0]:
-        GPIO.output(left_motor[0], GPIO.HIGH)
-        GPIO.output(left_motor[1], GPIO.LOW)
-        GPIO.output(right_motor[0], GPIO.HIGH)
-        GPIO.output(right_motor[1], GPIO.LOW)
-        time.sleep(0.0003)
-        GPIO.output(left_motor[0], GPIO.LOW)
-        time.sleep(0.0003)
-        GPIO.output(left_motor[0], GPIO.HIGH)
+        go_forwards()
     elif direction_state[1]:
-        pass
-        GPIO.output(left_motor[0], GPIO.LOW)
-        GPIO.output(left_motor[1], GPIO.HIGH)
-        GPIO.output(right_motor[0], GPIO.HIGH)
-        GPIO.output(right_motor[1], GPIO.LOW)
+        go_left()
     elif direction_state[2]:
-        GPIO.output(left_motor[0], GPIO.LOW)
-        GPIO.output(left_motor[1], GPIO.HIGH)
-        GPIO.output(right_motor[0], GPIO.LOW)
-        GPIO.output(right_motor[1], GPIO.HIGH)
-        time.sleep(0.0003)
-        GPIO.output(left_motor[0], GPIO.HIGH)
-        time.sleep(0.0003)
-        GPIO.output(left_motor[0], GPIO.LOW)
-        pass
+        go_backwards()
     elif direction_state[3]:
-        GPIO.output(left_motor[0], GPIO.HIGH)
-        GPIO.output(left_motor[1], GPIO.LOW)
-        GPIO.output(right_motor[0], GPIO.LOW)
-        GPIO.output(right_motor[1], GPIO.HIGH)
-        pass
+        go_right()
+
     onTime = 0.001
     if speed == 0:
         onTime = 0
@@ -111,4 +124,4 @@ while run == True:
     time.sleep(offTime)
 
 kblistener.stop()
-
+GPIO.cleanup()
