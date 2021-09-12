@@ -4,7 +4,6 @@ import RPi.GPIO as GPIO
 import time
 import os
 
-run = True
 GPIO.setmode(GPIO.BCM)
 left_motor = [22, 23]
 right_motor = [17, 27]
@@ -13,6 +12,8 @@ GPIO.setup(22, GPIO.OUT)
 GPIO.setup(27, GPIO.OUT)
 GPIO.setup(17, GPIO.OUT)
 speed = 1
+run = True
+use_camera = False
 controls_state = {
     "w": False,
     "s": False,
@@ -33,8 +34,7 @@ def on_press(key):
             elif key.char == ("d"):
                 controls_state["d"] = True
         else:
-            #robot.stop()
-            pass
+            stop()
     except AttributeError:
         print("special press {0}".format(key))
 
@@ -53,10 +53,7 @@ def on_release(key):
         elif key.char == ("d"):
             controls_state["d"] = False
         else:
-            GPIO.output(left_motor[0], GPIO.LOW)
-            GPIO.output(left_motor[1], GPIO.LOW)
-            GPIO.output(right_motor[0], GPIO.LOW)
-            GPIO.output(right_motor[1], GPIO.LOW)
+            stop()
     except AttributeError:
         print("special press {0}".format(key))
 
@@ -98,6 +95,12 @@ def go_right():
     GPIO.output(right_motor[0], GPIO.LOW)
     GPIO.output(right_motor[1], GPIO.HIGH)
 
+def stop():
+    GPIO.output(left_motor[0], GPIO.LOW)
+    GPIO.output(left_motor[1], GPIO.LOW)
+    GPIO.output(right_motor[0], GPIO.LOW)
+    GPIO.output(right_motor[1], GPIO.LOW)
+
 while run == True:
     if controls_state["w"]:
         go_forwards()
@@ -115,10 +118,7 @@ while run == True:
     else:
         offTime = onTime / speed - onTime
     time.sleep(onTime)
-    GPIO.output(left_motor[0], GPIO.LOW)
-    GPIO.output(left_motor[1], GPIO.LOW)
-    GPIO.output(right_motor[0], GPIO.LOW)
-    GPIO.output(right_motor[1], GPIO.LOW)
+    stop()
     time.sleep(offTime)
 
 kblistener.stop()
